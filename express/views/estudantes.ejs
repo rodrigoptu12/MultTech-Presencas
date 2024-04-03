@@ -10,14 +10,14 @@
 
 <body>
   <div class="header">
-    <a href="/" class="logo">Avaliações UNB</a>
+    <a href="/" class="logo">Management</a>
     <div class="header-right">
       <a href="/turmas">Turmas</a>
-        <a href="/estudantes">Estudante</a>
-        <a href="/departamentos">Departamento</a>
-          <a href="/perfil">Perfil</a>
-          <a href="/ranking">Ranking</a>
-          <a href="/logout">Logout</a>
+      <a href="/estudantes">Estudante</a>
+      <!-- <a href="/departamentos">Departamento</a> -->
+      <a href="/perfil">Perfil</a>
+      <!-- <a href="/ranking">Ranking</a> -->
+      <a href="/logout">Logout</a>
     </div>
   </div>
   <!-- mensagem -->
@@ -31,9 +31,11 @@
       <form method="POST" action="/estudantes">
         <label for="turma" required aria-label="Turma">Turma:</label>
         <select id="turma" name="turma">
-            <% turmas.forEach(function(turma) { %>
-                <option value="<%= turma.id %>"><%= turma.nome %></option>
-                <% }); %>
+          <% turmas.forEach(function(turma) { %>
+            <option value="<%= turma.id %>">
+              <%= turma.nome %>
+            </option>
+            <% }); %>
         </select>
         <label for="nome">Nome:</label>
         <input type="text" id="nome" name="nome" required aria-label="Nome" />
@@ -49,10 +51,10 @@
         <br />
         <label for="tipoChavePix">Tipo Chave Pix:</label>
         <select id="tipoChavePix" name="tipoChavePix" required aria-label="Tipo Chave Pix">
-            <option value="telefone">Telefone</option>
-            <option value="cpf">CPF</option>
-            <option value="cnpj">CNPJ</option>
-            <option value="chave_aleatoria">Chave Aleatória</option>
+          <option value="telefone">Telefone</option>
+          <option value="cpf">CPF</option>
+          <option value="cnpj">CNPJ</option>
+          <option value="chave_aleatoria">Chave Aleatória</option>
         </select>
         <!-- <label for="tipoChavePix">Tipo Chave Pix:</label> -->
         <!-- <input type="text" id="tipoChavePix" name="tipoChavePix" required aria-label="Tipo Chave Pix" /> -->
@@ -61,9 +63,20 @@
       </form>
 
       <!-- Atulizar Estudante -->
-      <form method="POST" action="/estudantes/update">
+      <form method="POST" id="form_atualizar_estudante" name="form_atualizar_estudante" action="/estudantes/update">
+        <label for="turma_atualizar" required aria-label="Turma">Turma:</label>
+        <select id="turma_atualizar" name="turma_atualizar">
+          <% turmas.forEach(function(turma) { %>
+            <option value="<%= turma.id %>">
+              <%= turma.nome %>
+            </option>
+            <% }); %>
+        </select>
+        <select id="aluno" name="aluno" required aria-label="Aluno">
+          <option value="">Selecione um aluno</option>
+        </select>
         <label for="id_atualizar">ID do Estudante:</label>
-        <input type="text" id="id_atualizar" name="id" required aria-label="ID do Estudante" />
+        <input type="text" id="id_atualizar" name="id" required aria-label="ID do Estudante" disabled />
         <br />
         <label for="nome_atualizar">Nome:</label>
         <input type="text" id="nome_atualizar" name="nome" required aria-label="Nome" />
@@ -79,16 +92,16 @@
         <br />
         <label for="tipoChavePix_atualizar">Tipo Chave Pix:</label>
         <select id="tipoChavePix_atualizar" name="tipoChavePix" required aria-label="Tipo Chave Pix">
-            <option value="telefone">Telefone</option>
-            <option value="cpf">CPF</option>
-            <option value="cnpj">CNPJ</option>
-            <option value="chave_aleatoria">Chave Aleatória</option>
+          <option value="telefone">Telefone</option>
+          <option value="cpf">CPF</option>
+          <option value="cnpj">CNPJ</option>
+          <option value="chave_aleatoria">Chave Aleatória</option>
         </select>
         <br />
-        <button type="submit">Atualizar Estudante</button>
-    </form>
-    
+        <button type="submit" id="buttonUpdate">Atualizar Estudante</button>
 
+
+      </form>
       <!-- Deletar Estudante -->
       <form method="POST" action="/estudantes/delete">
         <label for="id_excluir">ID do Estudante:</label>
@@ -100,11 +113,85 @@
     <div class="table-container">
       <button id="botao">Gerar Lista</button>
       <script>
-        document.getElementById("botao").onclick = function () {
-          var idTurma = document.getElementById("turma").value;
-          location.href = "/estudantes/"+ idTurma;
-        };
+        // document.getElementById("botao").onclick = function () {
+        //   var idTurma = document.getElementById("turma").value;
+        //   location.href = "/estudantes/" + idTurma;
+        // };
+
+        document.addEventListener('DOMContentLoaded', function () {
+          document.getElementById("botao").onclick = function () {
+            var idTurma = document.getElementById("turma").value;
+            location.href = "/estudantes/" + idTurma;
+          };
+
+          document.getElementById('turma_atualizar').addEventListener('click', function () {
+            const turmaId = this.value; // Obter o ID da turma selecionada 
+            console.log(turmaId);
+
+            // Fazer uma solicitação AJAX para buscar os alunos da turma selecionada
+            fetch(`/estudantes/turma/${turmaId}`)
+              .then(response => response.json())
+              .then(data => {
+                // Limpar a lista de alunos antes de adicionar os novos alunos
+                const alunoSelect = document.getElementById('aluno');
+                alunoSelect.innerHTML = '';
+
+                // Adicionar cada aluno como uma opção no menu suspenso de seleção de alunos
+                data.forEach(aluno => {
+                  const option = document.createElement('option');
+                  option.value = aluno.id;
+                  option.textContent = aluno.nome;
+                  alunoSelect.appendChild(option);
+                });
+              })
+              .catch(error => console.error('Erro ao buscar alunos da turma:', error));
+          });
+
+          // Adicionar um manipulador de eventos de mudança ao menu suspenso de seleção de aluno
+          document.getElementById('aluno').addEventListener('click', function () {
+            const alunoId = this.value; // Obter o ID do aluno selecionado
+
+            // Fazer uma solicitação AJAX para buscar os dados do aluno selecionado
+            fetch(`/estudantes/estudante/${alunoId}`)
+              .then(response => response.json())
+              .then(data => {
+                // Preencher os campos de entrada com os dados do aluno selecionado
+                document.getElementById('id_atualizar').value = data.id;
+                document.getElementById('nome_atualizar').value = data.nome;
+                document.getElementById('email_atualizar').value = data.email;
+                document.getElementById('celular_atualizar').value = data.celular;
+                document.getElementById('chavePix_atualizar').value = data.chavepix;
+                document.getElementById('tipoChavePix_atualizar').value = data.tipochavepix;
+              })
+              .catch(error => console.error('Erro ao buscar dados do aluno:', error));
+          });
+
+          // Manipulador de eventos para enviar o formulário de atualização
+          document.getElementById('buttonUpdate').addEventListener('click', function (event) {
+            // event.preventDefault(); // Impedir o envio padrão do formulário
+
+            const formData = new FormData(this); // Obter os dados do formulário
+            console.log('Formulário de atualização:', formData);
+            fetch('/estudantes/update', {
+              method: 'POST',
+              body: formData
+            })
+              .then(response => {
+                if (!response.ok) {
+                  throw new Error('Erro ao atualizar estudante');
+                }
+                // Redirecionar após a atualização
+                window.location.href = '/estudantes';
+              })
+              .catch(error => console.error('Erro ao enviar formulário de atualização:', error));
+          });
+        });
+
+
+
+
       </script>
+
       <ul>
         <% if (estudantes && estudantes.length> 0) { %> <% estudantes.forEach(function(estudante) { %>
             <li>
