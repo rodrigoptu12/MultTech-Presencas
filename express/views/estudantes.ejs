@@ -2,106 +2,132 @@
 
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Estudantes</title>
-    <link rel="stylesheet" href="/styles/estudantes.css" />
-  </head>
 
-  <body>
-    <div class="header">
-      <a href="/" class="logo">Avaliações UNB</a>
-      <div class="header-right">
-        <a href="/turmas">Turmas</a>
-        <% if (user.isadmin) { %>
+<head>
+  <title>Estudantes</title>
+  <link rel="stylesheet" href="/styles/estudantes.css" />
+</head>
+
+<body>
+  <div class="header">
+    <a href="/" class="logo">Avaliações UNB</a>
+    <div class="header-right">
+      <a href="/turmas">Turmas</a>
         <a href="/estudantes">Estudante</a>
         <a href="/departamentos">Departamento</a>
-        <% } %>
-        <a href="/perfil">Perfil</a>
-        <a href="/ranking">Ranking</a>
-        <a href="/logout">Logout</a>
-      </div>
+          <a href="/perfil">Perfil</a>
+          <a href="/ranking">Ranking</a>
+          <a href="/logout">Logout</a>
     </div>
-    <!-- mensagem -->
-    <p><%= mensagem %></p>
+  </div>
+  <!-- mensagem -->
+  <p>
+    <%= mensagem %>
+  </p>
 
-    <h1>Lista de Estudantes</h1>
-    <div class="conteiner">
-      <div class="form-container">
-        <form method="POST" action="/estudantes">
-          <label for="nome">Nome:</label>
-          <input type="text" id="nome" name="nome" required />
-          <br />
-          <label for="email">Email:</label>
-          <input type="email" id="email" name="email" required />
-          <br />
-          <label for="matricula">Matricula</label>
-          <input type="text" id="matricula" name="matricula" required />
-          <br />
-          <label for="curso">Curso:</label>
-          <input type="text" id="curso" name="curso" required />
-          <br />
-          <label for="senha">Senha:</label>
-          <input type="password" id="senha" name="senha" required />
-          <br />
-          <button type="submit">Adicionar Estudante</button>
-        </form>
-        <!-- Atulizar Estudante -->
-        <form method="POST" action="/estudantes/update">
-          <label for="id_atualizar">ID do Estudante:</label>
-          <input type="text" id="id_atualizar" name="id" required />
-          <br />
-          <label for="nome_atualizar">Nome:</label>
-          <input type="text" id="nome_atualizar" name="nome" required />
-          <br />
-          <label for="email_atualizar">Email:</label>
-          <input type="email" id="email_atualizar" name="email" required />
-          <br />
-          <label for="matricula_atualizar">Matricula:</label>
-          <input
-            type="text"
-            id="matricula_atualizar"
-            name="matricula"
-            required
-          />
-          <br />
-          <label for="curso_atualizar">Curso:</label>
-          <input type="text" id="curso_atualizar" name="curso" required />
-          <br />
-          <label for="senha_atualizar">Senha:</label>
-          <input type="password" id="senha_atualizar" name="senha" required />
-          <br />
-          <button type="submit">Atualizar Estudante</button>
-        </form>
+  <h1>Lista de Estudantes</h1>
+  <div class="conteiner">
+    <div class="form-container">
+      <form method="POST" action="/estudantes">
+        <label for="turma" required aria-label="Turma">Turma:</label>
+        <select id="turma" name="turma">
+            <% turmas.forEach(function(turma) { %>
+                <option value="<%= turma.id %>"><%= turma.nome %></option>
+                <% }); %>
+        </select>
+        <label for="nome">Nome:</label>
+        <input type="text" id="nome" name="nome" required aria-label="Nome" />
+        <br />
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required aria-label="Email" />
+        <br />
+        <label for="celular">Celular:</label>
+        <input type="text" id="celular" name="celular" required aria-label="Celular" />
+        <br />
+        <label for="chavePix">Chave Pix:</label>
+        <input type="text" id="chavePix" name="chavePix" required aria-label="Chave Pix" />
+        <br />
+        <label for="tipoChavePix">Tipo Chave Pix:</label>
+        <select id="tipoChavePix" name="tipoChavePix" required aria-label="Tipo Chave Pix">
+            <option value="telefone">Telefone</option>
+            <option value="cpf">CPF</option>
+            <option value="cnpj">CNPJ</option>
+            <option value="chave_aleatoria">Chave Aleatória</option>
+        </select>
+        <!-- <label for="tipoChavePix">Tipo Chave Pix:</label> -->
+        <!-- <input type="text" id="tipoChavePix" name="tipoChavePix" required aria-label="Tipo Chave Pix" /> -->
+        <br />
+        <button type="submit">Adicionar Estudante</button>
+      </form>
 
-        <!-- Deletar Estudante -->
-        <form method="POST" action="/estudantes/delete">
-          <label for="id_excluir">ID do Estudante:</label>
-          <input type="text" id="id_excluir" name="id" required />
-          <br />
-          <button type="submit">Excluir Estudante</button>
-        </form>
-      </div>
-      <div class="table-container">
-        <!-- Se apertar o botão gere a lista de estudantes -->
-        <button id="botao">Gerar Lista</button>
-        <script>
-          document.getElementById("botao").onclick = function () {
-            location.href = "/estudantes";
-          };
-        </script>
-        <ul>
-          <% if (estudantes && estudantes.length > 0) { %> <%
-          estudantes.forEach(function(estudante) { %>
-          <li>
-            <strong>ID:</strong> <%= estudante.id %><br />
-            <strong>Nome:</strong> <%= estudante.nome %><br />
-            <strong>Email:</strong> <%= estudante.email %>
-          </li>
-          <% }); %> <% } else { %>
-          <li>Nenhum estudante encontrado.</li>
-          <% } %>
-        </ul>
-      </div>
+      <!-- Atulizar Estudante -->
+      <form method="POST" action="/estudantes/update">
+        <label for="id_atualizar">ID do Estudante:</label>
+        <input type="text" id="id_atualizar" name="id" required aria-label="ID do Estudante" />
+        <br />
+        <label for="nome_atualizar">Nome:</label>
+        <input type="text" id="nome_atualizar" name="nome" required aria-label="Nome" />
+        <br />
+        <label for="email_atualizar">Email:</label>
+        <input type="email" id="email_atualizar" name="email" required aria-label="Email" />
+        <br />
+        <label for="celular_atualizar">Celular:</label>
+        <input type="text" id="celular_atualizar" name="celular" required aria-label="Celular" />
+        <br />
+        <label for="chavePix_atualizar">Chave Pix:</label>
+        <input type="text" id="chavePix_atualizar" name="chavePix" required aria-label="Chave Pix" />
+        <br />
+        <label for="tipoChavePix_atualizar">Tipo Chave Pix:</label>
+        <select id="tipoChavePix_atualizar" name="tipoChavePix" required aria-label="Tipo Chave Pix">
+            <option value="telefone">Telefone</option>
+            <option value="cpf">CPF</option>
+            <option value="cnpj">CNPJ</option>
+            <option value="chave_aleatoria">Chave Aleatória</option>
+        </select>
+        <br />
+        <button type="submit">Atualizar Estudante</button>
+    </form>
+    
+
+      <!-- Deletar Estudante -->
+      <form method="POST" action="/estudantes/delete">
+        <label for="id_excluir">ID do Estudante:</label>
+        <input type="text" id="id_excluir" name="id" required />
+        <br />
+        <button type="submit">Excluir Estudante</button>
+      </form>
     </div>
-  </body>
+    <div class="table-container">
+      <button id="botao">Gerar Lista</button>
+      <script>
+        document.getElementById("botao").onclick = function () {
+          var idTurma = document.getElementById("turma").value;
+          location.href = "/estudantes/"+ idTurma;
+        };
+      </script>
+      <ul>
+        <% if (estudantes && estudantes.length> 0) { %> <% estudantes.forEach(function(estudante) { %>
+            <li>
+              <strong>ID:</strong>
+              <%= estudante.id %><br />
+                <strong>Nome:</strong>
+                <%= estudante.nome %><br />
+                  <strong>Email:</strong>
+                  <%= estudante.email %> <br />
+                    <strong>Celular:</strong>
+                    <%= estudante.celular %> <br />
+                      <strong>Chave Pix:</strong>
+                      <%= estudante.chavepix %> <br />
+                        <strong>Tipo Chave Pix:</strong>
+                        <%= estudante.tipochavepix %> <br />
+            </li>
+            <% }); %>
+              <% } else { %>
+                <li>Nenhum estudante encontrado.</li>
+                <% } %>
+      </ul>
+    </div>
+  </div>
+</body>
+
 </html>

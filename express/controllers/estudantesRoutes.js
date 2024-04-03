@@ -5,28 +5,56 @@ const router = express.Router();
 const pool = require("../configDB"); // Importa o pool do módulo db.js
 
 router.get("/estudantes", (req, res) => {
-  const query = "SELECT * FROM estudantes";
-  const user = req.user;
+  const query = "SELECT * FROM turmas";
   pool.query(query, (err, result) => {
     if (err) {
       console.error(err);
       return res.render("estudantes", {
-        estudantes: [],
+        turmas: [],
         mensagem: "Falha ao obter estudantes.",
       });
     }
 
-    const estudantes = result.rows;
-    res.render("estudantes", {user, estudantes, mensagem: null });
+    const turmas = result.rows;
+    const estudantes = [];
+    res.render("estudantes", { turmas, estudantes, mensagem: null });
   });
 });
 
-router.post("/estudantes", (req, res) => {
-  const { nome, email, matricula, curso, senha } = req.body;
-  const query =
-    "INSERT INTO estudantes (nome, email, matricula, curso, senha) VALUES ($1, $2, $3, $4, $5)";
+router.get("/estudantes/:idTurma", (req, res) => {
+  const idTurma = req.params.idTurma;
+  const queryEstudantes = "SELECT Estudantes.* FROM Estudantes INNER JOIN Estudantes_Turmas ON Estudantes.id = Estudantes_Turmas.estudante_id WHERE Estudantes_Turmas.turma_id = $1 ";
+  const queryTurmas = "SELECT * FROM turmas";
 
-  pool.query(query, [nome, email, matricula, curso, senha], (err, result) => {
+  // Usamos Promise.all para executar as duas consultas de forma paralela
+  Promise.all([
+    pool.query(queryEstudantes, [idTurma]),
+    pool.query(queryTurmas)
+  ])
+  .then(([resultEstudantes, resultTurmas]) => {
+    const estudantes = resultEstudantes.rows;
+    const turmas = resultTurmas.rows;
+    res.render("estudantes", { turmas, estudantes, mensagem: null });
+  })
+  .catch(err => {
+    console.error(err);
+    res.render("estudantes", {
+      turmas: [],
+      estudantes: [],
+      mensagem: "Falha ao obter turmas ou estudantes da turma."
+    });
+  });
+});
+
+
+
+
+router.post("/estudantes", (req, res) => {
+  const { nome, celular, email, chavePix, tipoChavePix } = req.body;
+  const query =
+    "INSERT INTO estudantes (nome, celular, email, chavePix, tipoChavePix) VALUES ($1, $2, $3, $4, $5)";
+
+  pool.query(query, [nome, celular, email, chavePix, tipoChavePix], (err, result) => {
     if (err) {
       console.error(err);
       return res.render("estudantes", {
@@ -40,13 +68,13 @@ router.post("/estudantes", (req, res) => {
 
 // Atualizar estudante
 router.post("/estudantes/update", (req, res) => {
-  const { id, nome, email, matricula, curso, senha } = req.body;
+  const { id, nome, email, celular, chavePix, tipoChavePix } = req.body;
   const query =
-    "UPDATE estudantes SET nome = $1, email = $2, matricula = $3, curso = $4, senha = $5 WHERE id = $6";
+    "UPDATE estudantes SET nome = $1, email = $2, celular = $3, chavePix = $4, tipoChavePix = $5 WHERE id = $6";
 
   pool.query(
     query,
-    [nome, email, matricula, curso, senha, id],
+    [nome, email, celular, chavePix, tipoChavePix, id],
     (err, result) => {
       if (err) {
         console.error(err);

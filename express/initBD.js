@@ -14,10 +14,10 @@ const executeSQLFile = async (filePath, successMessage) => {
 
 // Executar arquivos SQL
 const sqlFiles = [
-  { filePath: "./sql/assessment.sql", successMessage: "Tabela assessments criada com sucesso!" },
-  { filePath: "./sql/basedata.sql", successMessage: "Dados inseridos com sucesso!" },
-  { filePath: "./sql/procedure.sql", successMessage: "Procedure criada com sucesso!" },
-  { filePath: "./sql/view.sql", successMessage: "View criada com sucesso!" }
+  { filePath: "./sql/assessment2.sql", successMessage: "Tabela assessments criada com sucesso!" },
+  // { filePath: "./sql/basedata.sql", successMessage: "Dados inseridos com sucesso!" },
+  // { filePath: "./sql/procedure.sql", successMessage: "Procedure criada com sucesso!" },
+  // { filePath: "./sql/view.sql", successMessage: "View criada com sucesso!" }
 ];
 
 async function runSQLFiles() {
