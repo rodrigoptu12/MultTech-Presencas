@@ -138,13 +138,14 @@ router.post("/estudantes", (req, res) => {
 
 // Atualizar estudante
 router.post("/estudantes/update", (req, res) => {
-  const { id, nome, email, celular, chavepix, tipochavepix } = req.body;
+  console.log("body", req.body)
+  const { aluno, nome, email, celular, chavePix, tipoChavePix } = req.body;
   const query =
     "UPDATE estudantes SET nome = $1, email = $2, celular = $3, chavepix = $4, tipochavepix = $5 WHERE id = $6";
 
   pool.query(
     query,
-    [nome, email, celular, chavepix, tipochavepix, id],
+    [nome, email, celular, chavePix, tipoChavePix, aluno],
     (err, result) => {
       if (err) {
         console.error(err);

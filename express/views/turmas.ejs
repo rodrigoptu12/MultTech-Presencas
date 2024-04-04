@@ -2,52 +2,160 @@
 
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Estudantes</title>
-    <link rel="stylesheet" href="/styles/turmas.css" />
-  </head>
 
-  <body>
-    <div class="header">
-      <a href="/" class="logo">Avaliações UNB</a>
-      <div class="header-right">
-        <a href="/turmas">Turmas</a>
-        <% if (user.isadmin) { %>
-          <a href="/estudantes">Estudante</a>
-          <a href="/departamentos">Departamento</a>
-          <% } %>
-        <a href="/perfil">Perfil</a>
-        <a href="/ranking">Ranking</a>
-        <a href="/logout">Logout</a>
-      </div>
-    </div>
-    <div class="container">
-      <!-- Se apertar o botão gere a lista de estudantes -->
-      <button class="buttonG" id="botao">Gerar Lista</button>
+<head>
+  <title>Turmas</title>
+  <link rel="stylesheet" href="/styles/estudantes.css" />
+</head>
 
-      <div class="containerCard">
-        <% if (disciplinas && disciplinas.length > 0) { %> <%
-        disciplinas.forEach(function(disciplina) { %>
-          <form method="GET" action="/turmas/<%= disciplina.id %>/avaliacoes">
-            <input type="hidden" name="turma_id" value="<%= disciplina.id %>" />
-            <button type="submit" class="card button">
-              <strong>Code:</strong> <%= disciplina.disciplina_id %><br />
-              <strong>Nome:</strong> <%= disciplina.nome_disciplina %><br />
-              <strong>Professor:</strong> <%= disciplina.nome_professor %><br />
-              <!-- periodo -->
-              <strong>Periodo:</strong> <%= disciplina.periodo %><br />
-            </button>
-          </form>
-          
-        <% }); %> <% } else { %>
-        <p>Nenhuma disciplina encontrada.</p>
-        <% } %>
-      </div>
+<body>
+  <div class="header">
+    <a href="/" class="logo">Management</a>
+    <div class="header-right">
+      <a href="/turmas">Turmas</a>
+      <a href="/estudantes">Estudante</a>
+      <!-- <a href="/departamentos">Departamento</a> -->
+      <a href="/perfil">Perfil</a>
+      <!-- <a href="/ranking">Ranking</a> -->
+      <a href="/logout">Logout</a>
     </div>
-  </body>
-  <script>
-    document.getElementById("botao").onclick = function () {
-      location.href = "/turmas";
-    };
-  </script>
+  </div>
+  <!-- mensagem -->
+  <p>
+    <%= mensagem %>
+  </p>
+
+  <h1>Turmas</h1>
+  <div class="conteiner">
+    <div class="form-container">
+      <form method="POST" action="/turmas/add">
+        <label for="turma" required aria-label="Turma">Turma:</label>
+        <select id="turma" name="turma">
+          <% turmas.forEach(function(turma) { %>
+            <option value="<%= turma.id %>">
+              <%= turma.nome %>
+            </option>
+            <% }); %>
+        </select>
+        <label for="nome">Nome:</label>
+        <input type="text" id="nome" name="nome" required aria-label="Nome" />
+        <br />
+        <button type="submit">Adicionar Turma</button>
+      </form>
+
+      <!-- Atulizar Estudante -->
+      <form method="POST" id="form_turma_atualizar" name="form_turma_atualizar" action="/turmas/update">
+        <label for="turma" required aria-label="Turma">Turma:</label>
+        <select id="turma_atualizar" name="turma_atualizar">
+          <% turmas.forEach(function(turma) { %>
+            <option value="<%= turma.id %>">
+              <%= turma.nome %>
+            </option>
+            <% }); %>
+        </select>
+        <label for="id_atualizar">ID da Turma:</label>
+        <input type="text" id="id_atualizar" name="id" required aria-label="ID da Turma" disabled />
+        <br />
+        <label for="nome_atualizar">Nome:</label>
+        <input type="text" id="nome_atualizar" name="nome" required aria-label="Nome" />
+        <br />
+        <button type="submit" id="buttonUpdate">Atualizar Turma</button>
+      </form>
+      <!-- Deletar Turma -->
+      <form method="POST" action="/turmas/delete">
+        <label for="id_excluir">ID da Turma:</label>
+        <input type="text" id="id_excluir" name="id" required />
+        <br />
+        <button type="submit">Excluir Turma</button>
+      </form>
+    </div>
+    <div class="table-container">
+      <button id="botao">Gerar Lista</button>
+      <script>
+        // document.getElementById("botao").onclick = function () {
+        //   var idTurma = document.getElementById("turma").value;
+        //   location.href = "/estudantes/" + idTurma;
+        // };
+
+        document.addEventListener('DOMContentLoaded', function () {
+          document.getElementById("botao").onclick = function () {
+            var idTurma = document.getElementById("turma").value;
+            location.href = "/turmas/" + idTurma;
+          };
+
+          document.getElementById('turma_atualizar').addEventListener('click', function () {
+            const turmaId = this.value; // Obter o ID da turma selecionada 
+            console.log(turmaId);
+
+            // Fazer uma solicitação AJAX para buscar os alunos da turma selecionada
+            fetch(`/turmas/turma/${turmaId}`)
+              .then(response => response.json())
+              .then(data => {
+                console.log(data);
+                // Preencher os campos de entrada com os dados do aluno selecionado
+                document.getElementById('id_atualizar').value = data.id;
+                document.getElementById('nome_atualizar').value = data.nome;
+              })
+              .catch(error => console.error('Erro ao buscar dados do aluno:', error));
+          });
+
+          // Adicionar um manipulador de eventos de mudança ao menu suspenso de seleção de aluno
+          // document.getElementById('aluno').addEventListener('click', function () {
+          //   const alunoId = this.value; // Obter o ID do aluno selecionado
+
+          //   // Fazer uma solicitação AJAX para buscar os dados do aluno selecionado
+          //   fetch(`/turmas/turma/${alunoId}`)
+          //     .then(response => response.json())
+          //     .then(data => {
+          //       // Preencher os campos de entrada com os dados do aluno selecionado
+          //       document.getElementById('id_atualizar').value = data.id;
+          //       document.getElementById('nome_atualizar').value = data.nome;
+          //       document.getElementById('email_atualizar').value = data.email;
+          //       document.getElementById('celular_atualizar').value = data.celular;
+          //       document.getElementById('chavePix_atualizar').value = data.chavepix;
+          //       document.getElementById('tipoChavePix_atualizar').value = data.tipochavepix;
+          //     })
+          //     .catch(error => console.error('Erro ao buscar dados do aluno:', error));
+          // });
+
+          // Manipulador de eventos para enviar o formulário de atualização
+          // document.getElementById('buttonUpdate').addEventListener('click', function (event) {
+          //   // event.preventDefault(); // Impedir o envio padrão do formulário
+
+          //   const formData = new FormData(this); // Obter os dados do formulário
+          //   console.log('Formulário de atualização:', formData);
+          //   fetch('/turmas/update', {
+          //     method: 'POST',
+          //     body: formData
+          //   })
+          //     .then(response => {
+          //       if (!response.ok) {
+          //         throw new Error('Erro ao atualizar turma');
+          //       }
+          //       // Redirecionar após a atualização
+          //       window.location.href = '/turmas';
+          //     })
+          //     .catch(error => console.error('Erro ao enviar formulário de atualização:', error));
+          // });
+        });
+
+      </script>
+
+      <ul>
+        <% if (turmas && turmas.length> 0) { %> <% turmas.forEach(function(turma) { %>
+            <li>
+              <strong>ID:</strong>
+              <%= turma.id %><br />
+                <strong>Nome:</strong>
+                <%= turma.nome %><br />
+            </li>
+            <% }); %>
+              <% } else { %>
+                <li>Nenhuma Turma encontrada.</li>
+                <% } %>
+      </ul>
+    </div>
+  </div>
+</body>
+
 </html>
